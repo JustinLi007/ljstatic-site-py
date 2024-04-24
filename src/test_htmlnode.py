@@ -1,12 +1,21 @@
 import unittest
 
 from htmlnode import HTMLNode
+from parentnode import ParentNode
+from leafnode import LeafNode
+
+leafNodes = [
+        LeafNode("Bold text","b"),
+        LeafNode("Normal text", None),
+        LeafNode("italic text", "i"),
+        LeafNode("Normal text", None),
+        ]
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html(self):
-        htmlNode = HTMLNode("h1", "header", "<children>", {"href":"url",
+        htmlNode = HTMLNode("h1", "header", leafNodes, {"href":"url",
             "target":"_blank"})
-        expected = """<h1 href="url" target="_blank">header<children></h1>"""
+        expected = """<h1 href="url" target="_blank">header<b>Bold text</b>Normal text<i>italic text</i>Normal text</h1>"""
         self.assertEqual(repr(htmlNode), expected)
 
     def test_tag_only(self):
@@ -20,8 +29,8 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(repr(htmlNode), expected)
 
     def test_tag_n_children_only(self):
-        htmlNode = HTMLNode("h1", None,  "<children>", None)
-        expected = """<h1><children></h1>"""
+        htmlNode = HTMLNode("h1", None, leafNodes, None)
+        expected = """<h1><b>Bold text</b>Normal text<i>italic text</i>Normal text</h1>"""
         self.assertEqual(repr(htmlNode), expected)
         
     def test_tag_n_props_only(self):

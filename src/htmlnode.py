@@ -27,10 +27,11 @@ class HTMLNode:
             closingTag = f"</{self.tag}>"
             properties = self.props_to_html()
             if not properties == None:
-                openTag = f"{openTag[:-1]} {self.props_to_html()}>"
-            childNodes = self.children
+                openTag = f"{openTag[:-1]} {properties}>"
+            childNodes = ("".join(map(lambda x: x.to_html(), self.children)) if
+                    not self.children == None else "")
             htmlElement = f"""{openTag}{innerText if not innerText == None
-else''}{"" if childNodes == None else childNodes}{closingTag}"""
+else''}{childNodes}{closingTag}"""
         if htmlElement == None:
             htmlElement = "" if innerText == None else innerText
 
