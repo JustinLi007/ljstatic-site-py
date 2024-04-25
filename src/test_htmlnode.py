@@ -38,11 +38,48 @@ class TestHTMLNode(unittest.TestCase):
         expected = """<h1 href="url" target="_blank"></h1>"""
         self.assertEqual(repr(htmlNode), expected)
 
-    def test_text_to_html_node(self):
+    def test_text_to_html_node_text(self):
         htmlNode = HTMLNode("div", None, None, None)
         textNode = TextNode("text content", DocTags.TEXT, None)
         leafNode = htmlNode.text_node_to_html_node(textNode)
         expected = "text content"
+        self.assertEqual(repr(leafNode), expected)
+
+    def test_text_to_html_node_bold(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("text content", DocTags.BOLD, None)
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = "<b>text content</b>"
+        self.assertEqual(repr(leafNode), expected)
+
+    def test_text_to_html_node_italic(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("text content", DocTags.ITALIC, None)
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = "<i>text content</i>"
+        self.assertEqual(repr(leafNode), expected)
+
+    def test_text_to_html_node_code(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("text content", DocTags.CODE, None)
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = "<code>text content</code>"
+        self.assertEqual(repr(leafNode), expected)
+
+    def test_text_to_html_node_link(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("text content", DocTags.LINK,
+                {"href":"https://google.com"})
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = """<a href="https://google.com">text content</a>"""
+        self.assertEqual(repr(leafNode), expected)
+
+    def test_text_to_html_node_img(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("", DocTags.IMAGE,
+                {"src":"pic.jpeg", "alt": "alt text"})
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = """<img src="pic.jpeg" alt="alt text"></img>"""
         self.assertEqual(repr(leafNode), expected)
 
     def test_to_html(self):
