@@ -1,7 +1,10 @@
 import unittest
-
+from htmlnode import DocTags
 from textnode import (
     TextNode,
+    is_delimiter,
+    split_by_delimiter,
+    split_nodes_delimiter,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -43,6 +46,118 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(
                 "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
                 )
+
+    def test_is_delimiter_double_asterisk(self):
+        text = "** word **"
+        delimiter = "**"
+        idx1 = 0
+        idx2 = 8
+        result1 = is_delimiter(text, idx1, delimiter)
+        result2 = is_delimiter(text, idx2, delimiter)
+        finalResult = result1 and result2
+        self.assertTrue(
+                finalResult, f"""Text: {text}, Delimiter: {delimiter},
+                Idx:{idx1}, {idx2}"""
+                )
+
+    def test_is_delimiter_no_closing_match(self):
+        text = "** word *"
+        delimiter = "**"
+        idx1 = 0
+        idx2 = 8
+        result1 = is_delimiter(text, idx1, delimiter)
+        result2 = is_delimiter(text, idx2, delimiter)
+        finalResult = result1 and not result2
+        self.assertTrue(
+                finalResult, f"""Text: {text}, Delimiter: {delimiter},
+                Idx:{idx1}, {idx2}"""
+                )
+
+    def test_split_by_delimiter_one_block(self):
+        text = "This is a text with a `code block` in it"
+        delimiter = '`'
+        expected = ["This is a text with a ", "code block", " in it"]
+        result = split_by_delimiter(text, "`")
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i][0], expected[i])
+
+    def test_split_by_delimiter_two_blocks(self):
+        text = "This is a text with a `code block` and another `code block` in it"
+        delimiter = '`'
+        expected = ["This is a text with a ", "code block", " and another ",
+                "code block", " in it"]
+        result = split_by_delimiter(text, "`")
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i][0], expected[i])
+
+    def test_split_by_delimiter_end_block(self):
+        text = "This is a text with a end `code block`"
+        delimiter = '`'
+        expected = ["This is a text with a end ", "code block"]
+        result = split_by_delimiter(text, "`")
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i][0], expected[i])
+
+    def test_split_nodes_delimiter_one_block(self):
+        old_nodes = [
+                TextNode("This is a text with a `code block` in it", DocTags.TEXT)
+                ]
+        delimiter = '`'
+        expected = [
+                TextNode("This is a text with a ", DocTags.TEXT),
+                TextNode("code block", DocTags.CODE),
+                TextNode(" in it", DocTags.TEXT),
+                ]
+        result = split_nodes_delimiter(old_nodes, delimiter, DocTags.CODE)
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i], expected[i])
+
+    def test_split_nodes_delimiter_two_block(self):
+        old_nodes = [
+                TextNode("This is a text with a `code block` and another `code block` in it",
+                    DocTags.TEXT)
+                ]
+        delimiter = '`'
+        expected = [
+                TextNode("This is a text with a ", DocTags.TEXT),
+                TextNode("code block", DocTags.CODE),
+                TextNode(" and another ", DocTags.TEXT),
+                TextNode("code block", DocTags.CODE),
+                TextNode(" in it", DocTags.TEXT),
+                ]
+        result = split_nodes_delimiter(old_nodes, delimiter, DocTags.CODE)
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i], expected[i])
+
+    def test_split_nodes_delimiter_end_block(self):
+        old_nodes = [TextNode("This is a text with a end `code block`",
+            DocTags.TEXT)]
+        delimiter = '`'
+        expected = [
+                TextNode("This is a text with a end ", DocTags.TEXT),
+                TextNode("code block", DocTags.CODE)
+                ]
+        result = split_nodes_delimiter(old_nodes, delimiter, DocTags.CODE)
+        self.assertTrue(len(expected) == len(result), f"""Unexpected result length:
+        Expected - {expected}, Actual - {result}
+        """)
+        for i in range(len(result)):
+           self.assertEqual(result[i], expected[i])
 
 if __name__ == "__main__":
     unittest.main()
