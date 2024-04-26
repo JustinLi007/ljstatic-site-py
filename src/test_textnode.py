@@ -5,6 +5,8 @@ from textnode import (
     is_delimiter,
     split_by_delimiter,
     split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -159,71 +161,99 @@ class TestTextNode(unittest.TestCase):
         for i in range(len(result)):
            self.assertEqual(result[i], expected[i])
 
-  def test_delim_bold(self):
-      node = TextNode("This is text with a **bolded** word", text_type_text)
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+    def test_delim_bold(self):
+        node = TextNode("This is text with a **bolded** word", DocTags.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", DocTags.BOLD)
         self.assertListEqual(
                 [
-                    TextNode("This is text with a ", text_type_text),
-                    TextNode("bolded", text_type_bold),
-                    TextNode(" word", text_type_text),
+                    TextNode("This is text with a ", DocTags.TEXT),
+                    TextNode("bolded", DocTags.BOLD),
+                    TextNode(" word", DocTags.TEXT),
                     ],
                 new_nodes,
                 )
 
     def test_delim_bold_double(self):
         node = TextNode(
-                "This is text with a **bolded** word and **another**", text_type_text
+                "This is text with a **bolded** word and **another**", DocTags.TEXT
                 )
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+        new_nodes = split_nodes_delimiter([node], "**", DocTags.BOLD)
         self.assertListEqual(
                 [
-                    TextNode("This is text with a ", text_type_text),
-                    TextNode("bolded", text_type_bold),
-                    TextNode(" word and ", text_type_text),
-                    TextNode("another", text_type_bold),
+                    TextNode("This is text with a ", DocTags.TEXT),
+                    TextNode("bolded", DocTags.BOLD),
+                    TextNode(" word and ", DocTags.TEXT),
+                    TextNode("another", DocTags.BOLD),
                     ],
                 new_nodes,
                 )
 
     def test_delim_bold_multiword(self):
         node = TextNode(
-                "This is text with a **bolded word** and **another**", text_type_text
+                "This is text with a **bolded word** and **another**", DocTags.TEXT
                 )
-        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
+        new_nodes = split_nodes_delimiter([node], "**", DocTags.BOLD)
         self.assertListEqual(
                 [
-                    TextNode("This is text with a ", text_type_text),
-                    TextNode("bolded word", text_type_bold),
-                    TextNode(" and ", text_type_text),
-                    TextNode("another", text_type_bold),
+                    TextNode("This is text with a ", DocTags.TEXT),
+                    TextNode("bolded word", DocTags.BOLD),
+                    TextNode(" and ", DocTags.TEXT),
+                    TextNode("another", DocTags.BOLD),
                     ],
                 new_nodes,
                 )
 
     def test_delim_italic(self):
-        node = TextNode("This is text with an *italic* word", text_type_text)
-        new_nodes = split_nodes_delimiter([node], "*", text_type_italic)
+        node = TextNode("This is text with an *italic* word", DocTags.TEXT)
+        new_nodes = split_nodes_delimiter([node], "*", DocTags.ITALIC)
         self.assertListEqual(
                 [
-                    TextNode("This is text with an ", text_type_text),
-                    TextNode("italic", text_type_italic),
-                    TextNode(" word", text_type_text),
+                    TextNode("This is text with an ", DocTags.TEXT),
+                    TextNode("italic", DocTags.ITALIC),
+                    TextNode(" word", DocTags.TEXT),
                     ],
                 new_nodes,
                 )
 
     def test_delim_code(self):
-        node = TextNode("This is text with a `code block` word", text_type_text)
-        new_nodes = split_nodes_delimiter([node], "`", text_type_code)
+        node = TextNode("This is text with a `code block` word", DocTags.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", DocTags.CODE)
         self.assertListEqual(
                 [
-                    TextNode("This is text with a ", text_type_text),
-                    TextNode("code block", text_type_code),
-                    TextNode(" word", text_type_text),
+                    TextNode("This is text with a ", DocTags.TEXT),
+                    TextNode("code block", DocTags.CODE),
+                    TextNode(" word", DocTags.TEXT),
                     ],
                 new_nodes,
                 )
+
+    def test_extract_markdown_images(self):
+        text = """This text contains a image link
+        ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        ![Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        wow."""
+        actual = extract_markdown_images(text)
+        expected = [
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png"),
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png"),
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png")
+                ]
+        self.assertListEqual(expected, actual)
+
+    def test_extract_markdown_links(self):
+        text = """This text contains a link
+        [Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        [Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        [Benjamin Bannekat](https://octodex.github.com/images/bannekat.png),
+        wow."""
+        actual = extract_markdown_links(text)
+        expected = [
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png"),
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png"),
+                ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png")
+                ]
+        self.assertListEqual(expected, actual)
 
 if __name__ == "__main__":
     unittest.main()

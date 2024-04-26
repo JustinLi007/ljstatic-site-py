@@ -1,4 +1,5 @@
 from htmlnode import DocTags
+import re
 
 text_type_text = "text"
 text_type_bold = "bold"
@@ -77,3 +78,14 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 TextNode(part[0], text_type if part[1] else DocTags.TEXT)  
                 )
     return new_nodes 
+
+def extract_markdown_images(text):
+    pattern = r"!\[(.*?)\]\((.*?)\)"
+    matches = re.findall(pattern, text)
+    return matches
+
+def extract_markdown_links(text):
+    pattern = r"\[(.*?)\]\((.*?)\)"
+    matches = re.findall(pattern, text)
+    return matches
+
