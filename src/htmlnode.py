@@ -36,9 +36,10 @@ class HTMLNode:
         if text_node.text_type == DocTags.CODE:
             return LeafNode(text_node.text, "code", None)
         if text_node.text_type == DocTags.LINK:
-            return LeafNode(text_node.text, "a", text_node.url)
+            return LeafNode(text_node.text, "a", {"href":text_node.url})
         if text_node.text_type == DocTags.IMAGE:
-            return LeafNode("", "img", text_node.url)
+            return LeafNode("", "img",
+                    {"src":text_node.url,"alt":text_node.text})
         raise Exception("Invalid text type.")
 
     def __repr__(self):

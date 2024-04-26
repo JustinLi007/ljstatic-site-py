@@ -68,16 +68,14 @@ class TestHTMLNode(unittest.TestCase):
 
     def test_text_to_html_node_link(self):
         htmlNode = HTMLNode("div", None, None, None)
-        textNode = TextNode("text content", DocTags.LINK,
-                {"href":"https://google.com"})
+        textNode = TextNode("text content", DocTags.LINK, "https://google.com")
         leafNode = htmlNode.text_node_to_html_node(textNode)
         expected = """<a href="https://google.com">text content</a>"""
         self.assertEqual(repr(leafNode), expected)
 
     def test_text_to_html_node_img(self):
         htmlNode = HTMLNode("div", None, None, None)
-        textNode = TextNode("", DocTags.IMAGE,
-                {"src":"pic.jpeg", "alt": "alt text"})
+        textNode = TextNode("alt text", DocTags.IMAGE, "pic.jpeg")
         leafNode = htmlNode.text_node_to_html_node(textNode)
         expected = """<img src="pic.jpeg" alt="alt text"></img>"""
         self.assertEqual(repr(leafNode), expected)
