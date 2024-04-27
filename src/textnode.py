@@ -90,16 +90,49 @@ def extract_markdown_links(text):
     return matches
 
 def split_nodes_image(old_nodes):
-    # extract image links
-    # use first tuple as split delimiter
-    # firstPartLen = length of the first split part
-    # create a TextNode of type TEXT with first split part
-    # create a TextNode of type IMAGE with the first tuple
-    # offset = firstPartLen + length of tuple content plus 5 ![]()
-    # repeat, split of the text[offset:] with the next tuple
-    return None 
+    new_nodes = []
+    for node in old_nodes:
+        imgLinkTups = extract_markdown_images(node.text)
+        splits = None
+        splitPartLen = 0
+        offset = 0
+        temp = node.text 
+        for img in imgLinkTups:
+            splits = temp.split(f"![{img[0]}]({img[1]})",1)
+            if len(splits) > 0 and len(splits[0]) > 0:
+                new_nodes.append(TextNode(splits[0], DocTags.TEXT))
+                splitPartLen = len(splits[0])
+                splits.pop(0)
+            new_nodes.append(
+                    TextNode(img[0], DocTags.IMAGE, img[1])
+                    )
+            offset = len(f"![{img[0]}]({img[1]})") + splitPartLen
+            temp = temp[offset:]
+        for remaining in splits:
+            if len(remaining) > 0:
+                new_nodes.append(TextNode(remaining, DocTags.TEXT))
+    return new_nodes 
 
 def split_nodes_link(old_nodes):
-    return None 
-
-
+    new_nodes = []
+    for node in old_nodes:
+        linkTups = extract_markdown_links(node.text)
+        splits = None
+        splitPartLen = 0
+        offset = 0
+        temp = node.text 
+        for link in linkTups:
+            splits = temp.split(f"[{link[0]}]({link[1]})",1)
+            if len(splits) > 0 and len(splits[0]) > 0:
+                new_nodes.append(TextNode(splits[0], DocTags.TEXT))
+                splitPartLen = len(splits[0])
+                splits.pop(0)
+            new_nodes.append(
+                    TextNode(link[0], DocTags.LINK, link[1])
+                    )
+            offset = len(f"[{link[0]}]({link[1]})") + splitPartLen
+            temp = temp[offset:]
+        for remaining in splits:
+            if len(remaining) > 0:
+                new_nodes.append(TextNode(remaining, DocTags.TEXT))
+    return new_nodes 

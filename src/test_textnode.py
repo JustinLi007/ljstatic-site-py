@@ -7,6 +7,8 @@ from textnode import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
+    split_nodes_image,
+    split_nodes_link,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -258,6 +260,92 @@ class TestTextNode(unittest.TestCase):
                 ("Benjamin Bannekat","https://octodex.github.com/images/bannekat.png")
                 ]
         self.assertListEqual(expected, actual)
+
+    def test_split_nodes_image(self):
+        node = TextNode("This is text with an ![image](https://a.com/b.png) and another ![second image](https://c.com/d.png)",
+                DocTags.TEXT
+                )
+        new_nodes = split_nodes_image([node])
+        expected = [
+                TextNode("This is text with an ", DocTags.TEXT),
+                TextNode("image", DocTags.IMAGE,"https://a.com/b.png"),
+                TextNode(" and another ", DocTags.TEXT),
+                TextNode("second image", DocTags.IMAGE, "https://c.com/d.png")
+                ]
+        self.assertListEqual(expected, new_nodes)
+
+    def test_split_nodes_link(self):
+        node = TextNode("This is text with an [image](https://a.com/b.png) and another [second image](https://c.com/d.png)",
+                DocTags.TEXT
+                )
+        new_nodes = split_nodes_link([node])
+        expected = [
+                TextNode("This is text with an ", DocTags.TEXT),
+                TextNode("image", DocTags.LINK,"https://a.com/b.png"),
+                TextNode(" and another ", DocTags.TEXT),
+                TextNode("second image", DocTags.LINK, "https://c.com/d.png")
+                ]
+        self.assertListEqual(expected, new_nodes)
+        
+    def test_split_image(self):
+        node = TextNode(
+                "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)",
+                DocTags.TEXT,
+                )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+                [
+                    TextNode("This is text with an ", DocTags.TEXT),
+                    TextNode("image", DocTags.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                    ],
+                new_nodes,
+                )
+
+    def test_split_image_single(self):
+        node = TextNode(
+                "![image](https://www.example.com/image.png)",
+                DocTags.TEXT
+                )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+                [TextNode("image", DocTags.IMAGE, "https://www.example.com/image.png")],
+                new_nodes
+                )
+
+    def test_split_images(self):
+        node = TextNode(
+                "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+                DocTags.TEXT,
+                )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+                [
+                    TextNode("This is text with an ", DocTags.TEXT),
+                    TextNode("image", DocTags.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                    TextNode(" and another ", DocTags.TEXT),
+                    TextNode(
+                        "second image", DocTags.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                        )
+                    ],
+                new_nodes
+                )
+
+    def test_split_links(self):
+        node = TextNode(
+                "This is text with a [link](https://boot.dev) and [another link](https://blog.boot.dev) with text that follows",
+                DocTags.TEXT
+                )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+                [
+                    TextNode("This is text with a ", DocTags.TEXT),
+                    TextNode("link", DocTags.LINK, "https://boot.dev"),
+                    TextNode(" and ", DocTags.TEXT),
+                    TextNode("another link", DocTags.LINK, "https://blog.boot.dev"),
+                    TextNode(" with text that follows", DocTags.TEXT)
+                    ],
+                new_nodes
+                )
 
 if __name__ == "__main__":
     unittest.main()
