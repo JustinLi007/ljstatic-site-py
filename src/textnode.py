@@ -89,3 +89,17 @@ def extract_markdown_links(text):
     matches = re.findall(pattern, text)
     return matches
 
+def split_nodes_image(old_nodes):
+    # extract image links
+    # use first tuple as split delimiter
+    # firstPartLen = length of the first split part
+    # create a TextNode of type TEXT with first split part
+    # create a TextNode of type IMAGE with the first tuple
+    # offset = firstPartLen + length of tuple content plus 5 ![]()
+    # repeat, split of the text[offset:] with the next tuple
+    return None 
+
+def split_nodes_link(old_nodes):
+    return None 
+
+

@@ -48,6 +48,10 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(
                 "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
                 )
+        
+    def test_repr_whitespace_text(self):
+        node = TextNode("  ", "type")
+        self.assertEqual("""TextNode(  , type, None)""", repr(node))
 
     def test_is_delimiter_double_asterisk(self):
         text = "** word **"

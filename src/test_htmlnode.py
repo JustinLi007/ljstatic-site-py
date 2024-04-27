@@ -38,6 +38,13 @@ class TestHTMLNode(unittest.TestCase):
         expected = """<h1 href="url" target="_blank"></h1>"""
         self.assertEqual(repr(htmlNode), expected)
 
+    def test_text_to_html_node_text_empty_content(self):
+        htmlNode = HTMLNode("div", None, None, None)
+        textNode = TextNode("  ", DocTags.TEXT, None)
+        leafNode = htmlNode.text_node_to_html_node(textNode)
+        expected = "  "
+        self.assertEqual(repr(leafNode), expected)
+
     def test_text_to_html_node_text(self):
         htmlNode = HTMLNode("div", None, None, None)
         textNode = TextNode("text content", DocTags.TEXT, None)
