@@ -9,6 +9,7 @@ from textnode import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -54,6 +55,10 @@ class TestTextNode(unittest.TestCase):
     def test_repr_whitespace_text(self):
         node = TextNode("  ", "type")
         self.assertEqual("""TextNode(  , type, None)""", repr(node))
+
+    def test_repr_whitespace_none(self):
+        node = TextNode("", "type")
+        self.assertEqual("""TextNode(, type, None)""", repr(node))
 
     def test_is_delimiter_double_asterisk(self):
         text = "** word **"
@@ -274,6 +279,12 @@ class TestTextNode(unittest.TestCase):
                 ]
         self.assertListEqual(expected, new_nodes)
 
+    def test_split_nodes_image_none(self):
+        node = TextNode("", DocTags.TEXT)
+        new_nodes = split_nodes_image([node])
+        expected = [TextNode("", DocTags.TEXT)]
+        self.assertListEqual(expected, new_nodes)
+
     def test_split_nodes_link(self):
         node = TextNode("This is text with an [image](https://a.com/b.png) and another [second image](https://c.com/d.png)",
                 DocTags.TEXT
@@ -285,6 +296,12 @@ class TestTextNode(unittest.TestCase):
                 TextNode(" and another ", DocTags.TEXT),
                 TextNode("second image", DocTags.LINK, "https://c.com/d.png")
                 ]
+        self.assertListEqual(expected, new_nodes)
+        
+    def test_split_nodes_link_none(self):
+        node = TextNode("", DocTags.TEXT)
+        new_nodes = split_nodes_link([node])
+        expected = [TextNode("", DocTags.TEXT)]
         self.assertListEqual(expected, new_nodes)
         
     def test_split_image(self):
@@ -346,6 +363,29 @@ class TestTextNode(unittest.TestCase):
                     ],
                 new_nodes
                 )
+
+    def test_text_to_textnodes(self):
+        text = (
+                "This is **text** with an *italic* word and a `code block` and an "
+                "![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets"
+                "/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+                )
+        expected = [
+                TextNode("This is ", DocTags.TEXT),
+                TextNode("text", DocTags.BOLD),
+                TextNode(" with an ", DocTags.TEXT),
+                TextNode("italic", DocTags.ITALIC),
+                TextNode(" word and a ", DocTags.TEXT),
+                TextNode("code block", DocTags.CODE),
+                TextNode(" and an ", DocTags.TEXT),
+                TextNode("image", DocTags.IMAGE,
+                    ("https://storage.googleapis.com/qvault-webapp-dynamic-assets/"
+                        "course_assets/zjjcJKZ.png")),
+                    TextNode(" and a ", DocTags.TEXT),
+                    TextNode("link", DocTags.LINK, "https://boot.dev")
+                    ]
+        actual = text_to_textnodes(text)
+        self.assertListEqual(expected, actual)
 
 if __name__ == "__main__":
     unittest.main()

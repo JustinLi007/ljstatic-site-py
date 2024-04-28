@@ -69,14 +69,17 @@ def split_by_delimiter(text, delimiter):
     return result 
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    parts = []
     new_nodes = []
     for node in old_nodes:
+        parts = []
         parts.extend(split_by_delimiter(node.text, delimiter))
-    for part in parts:
-        new_nodes.append(
-                TextNode(part[0], text_type if part[1] else DocTags.TEXT)  
-                )
+        if len(parts) == 1:
+            new_nodes.append(node)
+            continue
+        for part in parts:
+            new_nodes.append(
+                    TextNode(part[0], text_type if part[1] else DocTags.TEXT)  
+                    )
     return new_nodes 
 
 def extract_markdown_images(text):
@@ -93,6 +96,9 @@ def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
         imgLinkTups = extract_markdown_images(node.text)
+        if not len(imgLinkTups):
+            new_nodes.append(node)
+            continue
         splits = None
         splitPartLen = 0
         offset = 0
@@ -108,15 +114,19 @@ def split_nodes_image(old_nodes):
                     )
             offset = len(f"![{img[0]}]({img[1]})") + splitPartLen
             temp = temp[offset:]
-        for remaining in splits:
-            if len(remaining) > 0:
-                new_nodes.append(TextNode(remaining, DocTags.TEXT))
+        if not splits == None:
+            for remaining in splits:
+                if len(remaining) > 0:
+                    new_nodes.append(TextNode(remaining, DocTags.TEXT))
     return new_nodes 
 
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
         linkTups = extract_markdown_links(node.text)
+        if not len(linkTups):
+            new_nodes.append(node)
+            continue
         splits = None
         splitPartLen = 0
         offset = 0
@@ -132,7 +142,21 @@ def split_nodes_link(old_nodes):
                     )
             offset = len(f"[{link[0]}]({link[1]})") + splitPartLen
             temp = temp[offset:]
-        for remaining in splits:
-            if len(remaining) > 0:
-                new_nodes.append(TextNode(remaining, DocTags.TEXT))
+        if not splits == None:
+            for remaining in splits:
+                if len(remaining) > 0:
+                    new_nodes.append(TextNode(remaining, DocTags.TEXT))
     return new_nodes 
+
+def text_to_textnodes(text):
+    if text == None:
+        raise Exception("Invalid text value")
+    if not len(text):
+        return TextNode("", DocTags.TEXT)
+    node = TextNode(text, DocTags.TEXT)
+    boldNodes = split_nodes_delimiter([node], "**", DocTags.BOLD)
+    italicNodes = split_nodes_delimiter(boldNodes ,"*", DocTags.ITALIC)
+    codeNodes = split_nodes_delimiter(italicNodes, "`", DocTags.CODE)
+    imageNodes = split_nodes_image(codeNodes)
+    new_nodes = split_nodes_link(imageNodes)
+    return temp if not len(new_nodes) else new_nodes
