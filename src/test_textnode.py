@@ -1,5 +1,6 @@
 import unittest
-from htmlnode import DocTags
+from markdown_types import DocTags, BlockTypes
+
 from textnode import (
         TextNode,
         is_delimiter,

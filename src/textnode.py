@@ -1,4 +1,4 @@
-from htmlnode import DocTags
+from markdown_types import DocTags, BlockTypes
 import re
 
 text_type_text = "text"
@@ -58,7 +58,7 @@ def split_by_delimiter(text, delimiter):
     # no closing match
     if not start == None and end == None:
         raise Exception("Invalid Markdown syntax") 
-    
+
     if len(splits) == 0:
         return [(text, False)]
     result = []
@@ -179,4 +179,98 @@ def markdown_to_blocks(markdown):
     return list(map(lambda x: x.strip(), blocks))
 
 def block_to_block_type(block):
-    return None
+    if block == None:
+        raise Exception("No block provided.")
+    if len(block) == 0:
+        return BlockTypes.NORMAL
+    btype = BlockTypes.NORMAL 
+    ch = block[0]
+    if ch == '#' and isHeading(block):
+        btype = BlockTypes.HEADING 
+    elif ch == '`' and isCode(block):
+        btype = BlockTypes.CODE 
+    elif ch == '>' and isQuote(block):
+        btype = BlockTypes.QUOTE
+    elif (ch == '*' or ch == '-') and isUnorderedList(block):
+        btype = BlockTypes.UNORDERED_LIST
+    elif ch.isdigit() and isOrderedList(block):
+        btype = BlockTypes.ORDERED_LIST 
+    return btype
+
+def isHeading(block):
+    split = block.split(" ", 1)
+    if len(split) == 1:
+        return False
+
+    n = len(split[0])
+    if n > 6:
+        return False
+
+    validPrefix = (n == len(list(filter(lambda x: x == '#', split[0]))))
+    if not validPrefix:
+        return False
+
+    if not len(split[1]):
+        return False
+
+    return True
+
+def isCode(block):
+    if len(block) < 7:
+        return False
+    return block[:3] == "```" and block[-3:] == "```"
+
+def isQuote(block):
+    return len(block[1:].strip()) > 0
+
+def isUnorderedList(block):
+    split = block.split(" ", 1)
+    if len(split) < 2:
+        return False
+
+    if len(split[0]) > 1:
+        return False
+
+    validRemainder = False
+    for ch in split[1].strip():
+        if ch.isalpha() or ch.isdigit():
+            validRemainder = True
+            break
+
+    if not validRemainder:
+        return False
+
+    return True
+
+def isOrderedList(block):
+    items = block.split("\n")
+    count = 0
+
+    for item in items:
+        parts = item.split(" ", 1)
+        count += 1
+
+        if len(parts) < 2:
+            return False
+
+        if not parts[0][-1] == '.':
+            return False
+
+        if (not parts[0][:-1].isdigit()) or (not parts[0][:-1] == str(count)):
+            return False
+
+    return True
+
+print(block_to_block_type("#### heading") == BlockTypes.HEADING)
+print(block_to_block_type("``` this is a code block ```") == BlockTypes.CODE)
+print(block_to_block_type("> this is a quote") == BlockTypes.QUOTE)
+print(block_to_block_type(">> this is a quote also") == BlockTypes.QUOTE)
+print(block_to_block_type("* *this is a valid unordered list") == BlockTypes.UNORDERED_LIST)
+print(block_to_block_type("- this should be valid") == BlockTypes.UNORDERED_LIST)
+print(block_to_block_type("-- this should not be valid") == BlockTypes.NORMAL)
+print(block_to_block_type("** this should not be valid") == BlockTypes.NORMAL)
+print(block_to_block_type("0. this should not be valid") == BlockTypes.NORMAL)
+print(block_to_block_type("1.") == BlockTypes.NORMAL)
+print(block_to_block_type("1. ") == BlockTypes.ORDERED_LIST)
+print(block_to_block_type("1. \n1. ") == BlockTypes.NORMAL)
+print(block_to_block_type("1. \n2. \n3. ") == BlockTypes.ORDERED_LIST)

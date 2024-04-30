@@ -1,7 +1,8 @@
 import unittest
 
 from textnode import TextNode
-from htmlnode import HTMLNode, LeafNode, ParentNode, DocTags
+from htmlnode import HTMLNode, LeafNode, ParentNode 
+from markdown_types import DocTags
 
 leafNodes = [
         LeafNode("Bold text","b"),

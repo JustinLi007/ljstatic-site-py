@@ -1,12 +1,4 @@
-from enum import Enum
-
-class DocTags(Enum):
-    TEXT = 1
-    BOLD = 2
-    ITALIC = 3
-    CODE = 4
-    LINK = 5
-    IMAGE = 6
+from markdown_types import DocTags
 
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
