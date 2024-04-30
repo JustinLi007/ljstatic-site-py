@@ -1,22 +1,23 @@
 import unittest
 from htmlnode import DocTags
 from textnode import (
-    TextNode,
-    is_delimiter,
-    split_by_delimiter,
-    split_nodes_delimiter,
-    extract_markdown_images,
-    extract_markdown_links,
-    split_nodes_image,
-    split_nodes_link,
-    text_to_textnodes,
-    text_type_text,
-    text_type_bold,
-    text_type_italic,
-    text_type_code,
-    text_type_image,
-    text_type_link,
-)
+        TextNode,
+        is_delimiter,
+        split_by_delimiter,
+        split_nodes_delimiter,
+        extract_markdown_images,
+        extract_markdown_links,
+        split_nodes_image,
+        split_nodes_link,
+        text_to_textnodes,
+        markdown_to_blocks,
+        text_type_text,
+        text_type_bold,
+        text_type_italic,
+        text_type_code,
+        text_type_image,
+        text_type_link,
+        )
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -51,7 +52,7 @@ class TestTextNode(unittest.TestCase):
         self.assertEqual(
                 "TextNode(This is a text node, text, https://www.boot.dev)", repr(node)
                 )
-        
+
     def test_repr_whitespace_text(self):
         node = TextNode("  ", "type")
         self.assertEqual("""TextNode(  , type, None)""", repr(node))
@@ -95,7 +96,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i][0], expected[i])
+            self.assertEqual(result[i][0], expected[i])
 
     def test_split_by_delimiter_two_blocks(self):
         text = "This is a text with a `code block` and another `code block` in it"
@@ -107,7 +108,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i][0], expected[i])
+            self.assertEqual(result[i][0], expected[i])
 
     def test_split_by_delimiter_end_block(self):
         text = "This is a text with a end `code block`"
@@ -118,7 +119,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i][0], expected[i])
+            self.assertEqual(result[i][0], expected[i])
 
     def test_split_nodes_delimiter_one_block(self):
         old_nodes = [
@@ -135,7 +136,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i], expected[i])
+            self.assertEqual(result[i], expected[i])
 
     def test_split_nodes_delimiter_two_block(self):
         old_nodes = [
@@ -155,7 +156,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i], expected[i])
+            self.assertEqual(result[i], expected[i])
 
     def test_split_nodes_delimiter_end_block(self):
         old_nodes = [TextNode("This is a text with a end `code block`",
@@ -170,7 +171,7 @@ class TestTextNode(unittest.TestCase):
         Expected - {expected}, Actual - {result}
         """)
         for i in range(len(result)):
-           self.assertEqual(result[i], expected[i])
+            self.assertEqual(result[i], expected[i])
 
     def test_delim_bold(self):
         node = TextNode("This is text with a **bolded** word", DocTags.TEXT)
@@ -297,13 +298,13 @@ class TestTextNode(unittest.TestCase):
                 TextNode("second image", DocTags.LINK, "https://c.com/d.png")
                 ]
         self.assertListEqual(expected, new_nodes)
-        
+
     def test_split_nodes_link_none(self):
         node = TextNode("", DocTags.TEXT)
         new_nodes = split_nodes_link([node])
         expected = [TextNode("", DocTags.TEXT)]
         self.assertListEqual(expected, new_nodes)
-        
+
     def test_split_image(self):
         node = TextNode(
                 "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)",
@@ -386,6 +387,64 @@ class TestTextNode(unittest.TestCase):
                     ]
         actual = text_to_textnodes(text)
         self.assertListEqual(expected, actual)
+
+    def test_markdown_to_blocks(self):
+        text = (
+                "    This is a heading\n\n   This is a paragraph of text. It has some"
+                " **bold** and *italic* words inside it.     \n\n* This is a list"
+                " item\n* This is another list item      "
+                )
+        actual = markdown_to_blocks(text)
+        expected = [
+                "This is a heading",
+                ("This is a paragraph of text. It has some **bold** and *italic*"
+                    " words inside it."),
+                "* This is a list item\n* This is another list item"
+                ]
+        self.assertListEqual(expected, actual)
+
+    def test_markdown_to_blocks_2(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+                blocks,
+                [
+                    "This is **bolded** paragraph",
+                    "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+                    "* This is a list\n* with items",
+                    ],
+                )
+
+    def test_markdown_to_blocks_newlines(self):
+        md = """
+This is **bolded** paragraph
+
+
+
+
+This is another paragraph with *italic* text and `code` here
+This is the same paragraph on a new line
+
+* This is a list
+* with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+                blocks,
+                [
+                    "This is **bolded** paragraph",
+                    "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
+                    "* This is a list\n* with items",
+                    ],
+                )
 
 if __name__ == "__main__":
     unittest.main()

@@ -160,3 +160,23 @@ def text_to_textnodes(text):
     imageNodes = split_nodes_image(codeNodes)
     new_nodes = split_nodes_link(imageNodes)
     return temp if not len(new_nodes) else new_nodes
+
+def markdown_to_blocks(markdown):
+    if markdown == None:
+        raise Exception("No markdown text provided.")
+    lines = markdown.split("\n")
+    blocks = [] 
+    isblock = False
+    for line in lines:
+        if not len(line):
+            isblock = False
+            continue
+        if isblock and len(blocks) > 0:
+            blocks.append(f"{blocks.pop()}\n{line}")
+            continue
+        blocks.append(line)
+        isblock = True
+    return list(map(lambda x: x.strip(), blocks))
+
+def block_to_block_type(block):
+    return None
