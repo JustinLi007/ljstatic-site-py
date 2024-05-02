@@ -9,10 +9,9 @@ class DocTags(Enum):
     IMAGE = 6
 
 class BlockTypes(Enum):
-    NORMAL = 1
-    PARAGRAPH = 2
-    HEADING = 3
-    CODE = 4
-    QUOTE = 5
-    UNORDERED_LIST = 6
-    ORDERED_LIST = 7
+    PARAGRAPH = 1
+    HEADING = 2
+    CODE = 3
+    QUOTE = 4
+    UNORDERED_LIST = 5
+    ORDERED_LIST = 6

@@ -18,12 +18,12 @@ class TestHTMLNode(unittest.TestCase):
         expected = """<h1 href="url" target="_blank">header<b>Bold text</b>Normal text<i>italic text</i>Normal text</h1>"""
         self.assertEqual(repr(htmlNode), expected)
 
-    def test_tag_only(self):
+    def test_tag_only_html_node(self):
         htmlNode = HTMLNode("h1", None,  None, None)
         expected = """<h1></h1>"""
         self.assertEqual(repr(htmlNode), expected)
 
-    def test_value_only(self):
+    def test_value_only_html_node(self):
         htmlNode = HTMLNode(None, "header", None, None)
         expected = """header"""
         self.assertEqual(repr(htmlNode), expected)
@@ -88,7 +88,7 @@ class TestHTMLNode(unittest.TestCase):
         expected = """<img src="pic.jpeg" alt="alt text"></img>"""
         self.assertEqual(repr(leafNode), expected)
 
-    def test_to_html(self):
+    def test_to_html_leaf_node(self):
         leafNode = LeafNode("para", "p", {"class":"row"})
         expected = "<p class=\"row\">para</p>"
         self.assertEqual(repr(leafNode), expected)

@@ -182,8 +182,8 @@ def block_to_block_type(block):
     if block == None:
         raise Exception("No block provided.")
     if len(block) == 0:
-        return BlockTypes.NORMAL
-    btype = BlockTypes.NORMAL 
+        return BlockTypes.PARAGRAPH
+    btype = BlockTypes.PARAGRAPH 
     ch = block[0]
     if ch == '#' and isHeading(block):
         btype = BlockTypes.HEADING 
@@ -224,22 +224,24 @@ def isQuote(block):
     return len(block[1:].strip()) > 0
 
 def isUnorderedList(block):
-    split = block.split(" ", 1)
-    if len(split) < 2:
-        return False
+    items = block.split("\n")
 
-    if len(split[0]) > 1:
-        return False
+    for item in items:
+        split = item.split(" ", 1)
+        if len(split) < 2:
+            return False
 
-    validRemainder = False
-    for ch in split[1].strip():
-        if ch.isalpha() or ch.isdigit():
-            validRemainder = True
-            break
+        if len(split[0]) > 1:
+            return False
 
-    if not validRemainder:
-        return False
+        validRemainder = False
+        for ch in split[1].strip():
+            if ch.isalpha() or ch.isdigit():
+                validRemainder = True
+                break
 
+        if not validRemainder:
+            return False
     return True
 
 def isOrderedList(block):
@@ -261,16 +263,18 @@ def isOrderedList(block):
 
     return True
 
+"""
 print(block_to_block_type("#### heading") == BlockTypes.HEADING)
 print(block_to_block_type("``` this is a code block ```") == BlockTypes.CODE)
 print(block_to_block_type("> this is a quote") == BlockTypes.QUOTE)
 print(block_to_block_type(">> this is a quote also") == BlockTypes.QUOTE)
 print(block_to_block_type("* *this is a valid unordered list") == BlockTypes.UNORDERED_LIST)
 print(block_to_block_type("- this should be valid") == BlockTypes.UNORDERED_LIST)
-print(block_to_block_type("-- this should not be valid") == BlockTypes.NORMAL)
-print(block_to_block_type("** this should not be valid") == BlockTypes.NORMAL)
-print(block_to_block_type("0. this should not be valid") == BlockTypes.NORMAL)
-print(block_to_block_type("1.") == BlockTypes.NORMAL)
+print(block_to_block_type("-- this should not be valid") == BlockTypes.PARAGRAPH)
+print(block_to_block_type("** this should not be valid") == BlockTypes.PARAGRAPH)
+print(block_to_block_type("0. this should not be valid") == BlockTypes.PARAGRAPH)
+print(block_to_block_type("1.") == BlockTypes.PARAGRAPH)
 print(block_to_block_type("1. ") == BlockTypes.ORDERED_LIST)
-print(block_to_block_type("1. \n1. ") == BlockTypes.NORMAL)
+print(block_to_block_type("1. \n1. ") == BlockTypes.PARAGRAPH)
 print(block_to_block_type("1. \n2. \n3. ") == BlockTypes.ORDERED_LIST)
+"""

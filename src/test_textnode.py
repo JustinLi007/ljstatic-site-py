@@ -12,6 +12,7 @@ from textnode import (
         split_nodes_link,
         text_to_textnodes,
         markdown_to_blocks,
+        block_to_block_type,
         text_type_text,
         text_type_bold,
         text_type_italic,
@@ -446,6 +447,134 @@ This is the same paragraph on a new line
                     "* This is a list\n* with items",
                     ],
                 )
+
+    def test_block_to_block_type_heading_one(self):
+        block = "# This is a header\nthat span multiple lines."
+        actual = block_to_block_type(block)
+        expected = BlockTypes.HEADING
+        self.assertEqual(expected, actual)
+
+    def test_block_to_block_type_heading_six(self):
+        block = "###### This is a header\nthat span multiple lines."
+        actual = block_to_block_type(block)
+        expected = BlockTypes.HEADING
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_heading_false(self):
+        block = "####### This is a header\nthat span multiple lines."
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_heading_false_2(self):
+        block = "####%# this is not a header\nthat span multiple lines."
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_code(self):
+        block = "```This is a code block```"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.CODE
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_code_2(self):
+        block = "``` This is a code block ```"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.CODE
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_code_false(self):
+        block = "```This is a code block``"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_quote(self):
+        block = ">This is a quote"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.QUOTE
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_quote_2(self):
+        block = "> This is a quote"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.QUOTE
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_quote_false(self):
+        block = "> "
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_quote_false_2(self):
+        block = ">"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+
+    def test_block_to_block_type_ul(self):
+        block = "* This is a ul item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.UNORDERED_LIST
+        self.assertEqual(expected, actual)
+
+    def test_block_to_block_type_ul_2(self):
+        block = "* This is a ul item\n* this is a ul item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.UNORDERED_LIST
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ul_false(self):
+        block = "* This is a ul item\n*this is a ul item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ol(self):
+        block = "1. This is a ol item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.ORDERED_LIST
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ol_multiple(self):
+        block = "1. This is a ol item\n2. this is a ol item\n3.  "
+        actual = block_to_block_type(block)
+        expected = BlockTypes.ORDERED_LIST
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ol_false(self):
+        block = "1.This is not a ol item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ol_false_2(self):
+        block = "1. This is a ol item\n2.not okay"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+        
+    def test_block_to_block_type_ol_false_3(self):
+        block = "0. This is not a ol item"
+        actual = block_to_block_type(block)
+        expected = BlockTypes.PARAGRAPH
+        self.assertEqual(expected, actual)
+
+    def test_block_to_block_types(self):
+        block = "# heading"
+        self.assertEqual(block_to_block_type(block), BlockTypes.HEADING)
+        block = "```\ncode\n```"
+        self.assertEqual(block_to_block_type(block), BlockTypes.CODE) 
+        block = "> quote\n> more quote"
+        self.assertEqual(block_to_block_type(block), BlockTypes.QUOTE) 
+        block = "* list\n* items"
+        self.assertEqual(block_to_block_type(block), BlockTypes.UNORDERED_LIST)
+        block = "1. list\n2. items"
+        self.assertEqual(block_to_block_type(block), BlockTypes.ORDERED_LIST)
+        block = "paragraph"
+        self.assertEqual(block_to_block_type(block), BlockTypes.PARAGRAPH) 
 
 if __name__ == "__main__":
     unittest.main()
