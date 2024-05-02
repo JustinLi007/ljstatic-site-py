@@ -263,18 +263,5 @@ def isOrderedList(block):
 
     return True
 
-"""
-print(block_to_block_type("#### heading") == BlockTypes.HEADING)
-print(block_to_block_type("``` this is a code block ```") == BlockTypes.CODE)
-print(block_to_block_type("> this is a quote") == BlockTypes.QUOTE)
-print(block_to_block_type(">> this is a quote also") == BlockTypes.QUOTE)
-print(block_to_block_type("* *this is a valid unordered list") == BlockTypes.UNORDERED_LIST)
-print(block_to_block_type("- this should be valid") == BlockTypes.UNORDERED_LIST)
-print(block_to_block_type("-- this should not be valid") == BlockTypes.PARAGRAPH)
-print(block_to_block_type("** this should not be valid") == BlockTypes.PARAGRAPH)
-print(block_to_block_type("0. this should not be valid") == BlockTypes.PARAGRAPH)
-print(block_to_block_type("1.") == BlockTypes.PARAGRAPH)
-print(block_to_block_type("1. ") == BlockTypes.ORDERED_LIST)
-print(block_to_block_type("1. \n1. ") == BlockTypes.PARAGRAPH)
-print(block_to_block_type("1. \n2. \n3. ") == BlockTypes.ORDERED_LIST)
-"""
+# blocks will be the parent node
+# create leaf nodes from the contents of the block
