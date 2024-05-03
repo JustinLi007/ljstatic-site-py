@@ -241,8 +241,6 @@ def isOrderedList(block):
 
     return True
 
-# blocks will be the parent node
-# create leaf nodes from the contents of the block
 def markdown_to_html_node(markdown):
     htmlNode = HTMLNode("div", None, None, None)
     if markdown == None:
@@ -253,10 +251,38 @@ def markdown_to_html_node(markdown):
     for block in blocks:
         blocktype = block_to_block_type(block)    
         nodes.append(block_to_node(block, blocktype))
-    for node in nodes:
-        continue
-
-    return None
+    htmlNode.children = nodes;
+    return htmlNode
 
 def block_to_node(block, blocktype):
+    if blocktype == PARAGRAPH:
+        return
+    if blocktype == HEADING:
+        return
+    if blocktype == CODE:
+        return 
+    if blocktype == QUOTE:
+        return
+    if blocktype == UNORDERED_LIST:
+        return
+    if blocktype == ORDERED_LIST:
+        return 
+    return None
+
+def createParagraphNode(block, blocktype):
+    return None
+
+def createHeadingNode(block, blocktype):
+    return None
+
+def createCodeNode(block, blocktype):
+    return None
+
+def createQuoteNode(block, blocktype):
+    return None
+
+def createULNode(block, blocktype):
+    return None
+
+def createOLNode(block, blocktype):
     return None
