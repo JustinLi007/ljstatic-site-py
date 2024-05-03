@@ -1,18 +1,8 @@
 import unittest
 from markdown_types import DocTags, BlockTypes
-
+from markdown import *
 from textnode import (
         TextNode,
-        is_delimiter,
-        split_by_delimiter,
-        split_nodes_delimiter,
-        extract_markdown_images,
-        extract_markdown_links,
-        split_nodes_image,
-        split_nodes_link,
-        text_to_textnodes,
-        markdown_to_blocks,
-        block_to_block_type,
         text_type_text,
         text_type_bold,
         text_type_italic,
