@@ -286,7 +286,7 @@ def block_to_node(block, blocktype):
     raise Exception("Invalid block type.")
 
 def createParagraphNode(block):
-    textNodes = text_to_textnodes(block)
+    textNodes = text_to_textnodes(block.replace("\n", " "))
     leafNodes = []
     for textNode in textNodes:
         leafNodes.append(text_node_to_html_node(textNode))
@@ -309,13 +309,13 @@ def createCodeNode(block):
     leafNodes = []
     for textNode in textNodes:
         leafNodes.append(text_node_to_html_node(textNode))
-    #codeElement = ParentNode(leafNodes, "code", None)
-    #parentNode = ParentNode([codeElement], "pre", None)
     parentNode = ParentNode(leafNodes, "pre", None)
     return parentNode
 
 def createQuoteNode(block):
-    trimmedBlock = block.lstrip(">")
+    quotes = block.split("\n")
+    trimmedQuotes = list(map(lambda x: x.lstrip(">").replace("\n", " "), quotes))
+    trimmedBlock = "".join(trimmedQuotes)
     textNodes = text_to_textnodes(trimmedBlock)
     leafNodes = []
     for textNode in textNodes:
@@ -324,7 +324,7 @@ def createQuoteNode(block):
     return parentNode
 
 def createULNode(block):
-    ulItems = list(map(lambda x: x.lstrip("*")[1:], block.split("\n")))
+    ulItems = list(map(lambda x: x.lstrip("*").lstrip("-")[1:], block.split("\n")))
     itemNodes = []
     for item in ulItems:
         itemParts = text_to_textnodes(item)
