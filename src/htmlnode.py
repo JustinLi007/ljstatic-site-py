@@ -18,22 +18,6 @@ class HTMLNode:
             attrs.append(f"{key}=\"{self.props[key]}\"")
         return " ".join(attrs)
 
-    def text_node_to_html_node(self, text_node):
-        if text_node.text_type == DocTags.TEXT:
-            return LeafNode(text_node.text, None, None)
-        if text_node.text_type == DocTags.BOLD:
-            return LeafNode(text_node.text, "b", None)
-        if text_node.text_type == DocTags.ITALIC:
-            return LeafNode(text_node.text, "i", None)
-        if text_node.text_type == DocTags.CODE:
-            return LeafNode(text_node.text, "code", None)
-        if text_node.text_type == DocTags.LINK:
-            return LeafNode(text_node.text, "a", {"href":text_node.url})
-        if text_node.text_type == DocTags.IMAGE:
-            return LeafNode("", "img",
-                    {"src":text_node.url,"alt":text_node.text})
-        raise Exception("Invalid text type.")
-
     def __repr__(self):
         htmlElement = None
         openTag = f"<{self.tag}>" if not self.tag == None else self.tag
@@ -99,5 +83,4 @@ class ParentNode(HTMLNode):
             childElements.append(child.to_html())
 
         htmlElement = f"""{openTag}{"".join(childElements)}{closingTag}"""
-
         return htmlElement

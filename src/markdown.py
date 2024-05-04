@@ -10,6 +10,22 @@ def is_delimiter(text, idx, delimiter):
     part = text[idx:idx+n]
     return part == delimiter
 
+def text_node_to_html_node(text_node):
+    if text_node.text_type == DocTags.TEXT:
+        return LeafNode(text_node.text, None, None)
+    if text_node.text_type == DocTags.BOLD:
+        return LeafNode(text_node.text, "b", None)
+    if text_node.text_type == DocTags.ITALIC:
+        return LeafNode(text_node.text, "i", None)
+    if text_node.text_type == DocTags.CODE:
+        return LeafNode(text_node.text, "code", None)
+    if text_node.text_type == DocTags.LINK:
+        return LeafNode(text_node.text, "a", {"href":text_node.url})
+    if text_node.text_type == DocTags.IMAGE:
+        return LeafNode("", "img",
+                {"src":text_node.url,"alt":text_node.text})
+    raise Exception("Invalid text type.")
+
 def split_by_delimiter(text, delimiter):
     if text == None or delimiter == None or len(text.strip()) == 0:
         return []
@@ -255,34 +271,78 @@ def markdown_to_html_node(markdown):
     return htmlNode
 
 def block_to_node(block, blocktype):
-    if blocktype == PARAGRAPH:
-        return
-    if blocktype == HEADING:
-        return
-    if blocktype == CODE:
-        return 
-    if blocktype == QUOTE:
-        return
-    if blocktype == UNORDERED_LIST:
-        return
-    if blocktype == ORDERED_LIST:
-        return 
-    return None
+    if blocktype == BlockTypes.PARAGRAPH:
+        return createParagraphNode(block)
+    if blocktype == BlockTypes.HEADING:
+        return createHeadingNode(block)
+    if blocktype == BlockTypes.CODE:
+        return createCodeNode(block)
+    if blocktype == BlockTypes.QUOTE:
+        return createQuoteNode(block)
+    if blocktype == BlockTypes.UNORDERED_LIST:
+        return createULNode(block)
+    if blocktype == BlockTypes.ORDERED_LIST:
+        return createOLNode(block)
+    raise Exception("Invalid block type.")
 
-def createParagraphNode(block, blocktype):
-    return None
+def createParagraphNode(block):
+    textNodes = text_to_textnodes(block)
+    leafNodes = []
+    for textNode in textNodes:
+        leafNodes.append(text_node_to_html_node(textNode))
+    parentNode = ParentNode(leafNodes, "p", None)
+    return parentNode
 
-def createHeadingNode(block, blocktype):
-    return None
+def createHeadingNode(block):
+    n = len(block.split(" ", 1)[0])
+    trimmedBlock = block.lstrip("#")[1:]
+    textNodes = text_to_textnodes(trimmedBlock)
+    leafNodes = []
+    for textNode in textNodes:
+        leafNodes.append(text_node_to_html_node(textNode))
+    parentNode = ParentNode(leafNodes, f"h{n}", None)
+    return parentNode
 
-def createCodeNode(block, blocktype):
-    return None
+def createCodeNode(block):
+    trimmedBlock = block[2:-2]
+    textNodes = text_to_textnodes(trimmedBlock)
+    leafNodes = []
+    for textNode in textNodes:
+        leafNodes.append(text_node_to_html_node(textNode))
+    #codeElement = ParentNode(leafNodes, "code", None)
+    #parentNode = ParentNode([codeElement], "pre", None)
+    parentNode = ParentNode(leafNodes, "pre", None)
+    return parentNode
 
-def createQuoteNode(block, blocktype):
-    return None
+def createQuoteNode(block):
+    trimmedBlock = block.lstrip(">")
+    textNodes = text_to_textnodes(trimmedBlock)
+    leafNodes = []
+    for textNode in textNodes:
+        leafNodes.append(text_node_to_html_node(textNode))
+    parentNode = ParentNode(leafNodes, "blockquote", None)
+    return parentNode
 
-def createULNode(block, blocktype):
-    return None
+def createULNode(block):
+    ulItems = list(map(lambda x: x.lstrip("*")[1:], block.split("\n")))
+    itemNodes = []
+    for item in ulItems:
+        itemParts = text_to_textnodes(item)
+        leafNodes = []
+        for part in itemParts:
+            leafNodes.append(text_node_to_html_node(part))
+        itemNodes.append(ParentNode(leafNodes, "li", None))
+    ulElement = ParentNode(itemNodes, "ul", None)
+    return ulElement 
 
-def createOLNode(block, blocktype):
-    return None
+def createOLNode(block):
+    olItems = list(map(lambda x: x.split(" ", 1)[1], block.split("\n")))
+    itemNodes = []
+    for item in olItems:
+        itemParts = text_to_textnodes(item)
+        leafNodes = []
+        for part in itemParts:
+            leafNodes.append(text_node_to_html_node(part))
+        itemNodes.append(ParentNode(leafNodes, "li", None))
+    olElement = ParentNode(itemNodes, "ol", None)
+    return olElement 
