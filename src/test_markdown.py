@@ -68,7 +68,7 @@ class TestMarkdown(unittest.TestCase):
         "</div>")
         self.assertEqual(expected, repr(actual))
 
-    def test_markdown_to_html_5(self):
+    def test_markdown_to_html_6(self):
         markdown = (
                 "### Header 3\n\n"
                 "This is a regular paragraph\n\n"
@@ -95,6 +95,29 @@ class TestMarkdown(unittest.TestCase):
                 "<li>ul item 2</li>"
                 "<li>ul item 3</li>"
                 "</ol>"
+        "</div>")
+        self.assertEqual(expected, repr(actual))
+
+    def test_markdown_to_html_7(self):
+        codeBlock = ("```\n"
+                "This is a block of code\n"
+                "This is the second line of code\n"
+                "This is the third line of code\n"
+                "```\n\n")
+        markdown = (
+                "### Header 3\n\n"
+                "This is a regular paragraph\n\n"
+                f"{codeBlock}"
+                ">This is a quote"
+                )
+        actual = markdown_to_html_node(markdown)
+        expected = ("<div><h3>Header 3</h3><p>This is a regular paragraph</p>"
+                "<pre><code>"
+                "This is a block of code\n"
+                "This is the second line of code\n"
+                "This is the third line of code"
+                "</code></pre>"
+                "<blockquote>This is a quote</blockquote>"
         "</div>")
         self.assertEqual(expected, repr(actual))
 

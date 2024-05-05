@@ -56,7 +56,7 @@ class LeafNode(HTMLNode):
             properties = self.props_to_html()
             if not properties == None:
                 openTag = f"{openTag[:-1]} {properties}>"
-            htmlElement = f"{openTag}{innerText}{closingTag}"
+            htmlElement = f"{openTag}{innerText.strip()}{closingTag}"
         if htmlElement == None:
             htmlElement = innerText
 
