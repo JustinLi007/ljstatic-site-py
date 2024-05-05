@@ -3,9 +3,6 @@ import shutil
 from  textnode import TextNode
 
 def main():
-    #textNode = TextNode("This is a text node", "bold", "https://www.google.com")
-    #print(textNode)
-
     path = "./"
     src = "static"
     dst = "public"
@@ -13,7 +10,7 @@ def main():
 
     clearDir(path, dst)
     createDir(path, dst)
-    copyAll(os.path.join(path, src), os.path.join(path, src), os.path.join(path, dst), ignore)
+    copyFilesRecursive(os.path.join(path, src), os.path.join(path, dst), ignore)
 
 def clearDir(path, targetDir):
     if targetDir in os.listdir(path):
@@ -32,7 +29,7 @@ def createDir(path, newDir, permissions=0o777):
 def RmTreeErrorHandler(func, path, excinfo):
     print(func, path, excinfo)
    
-def copyAll(path, src, dst, ignore=None):
+def copyFilesRecursive(path, dst, ignore=None):
     pathEntries = os.listdir(path)
     for entry in pathEntries:
         if ignore and any(ord(entry[0]) == ord(item) for item in ignore):
@@ -46,6 +43,6 @@ def copyAll(path, src, dst, ignore=None):
         else:
             if not os.path.exists(os.path.join(dst, entry)):
                 createDir(dst, entry)
-            copyAll(tempPath, src, dst, ignore)
+            copyFilesRecursive(tempPath, os.path.join(dst, entry), ignore)
 
 main()
