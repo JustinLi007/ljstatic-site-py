@@ -1,12 +1,4 @@
-from enum import Enum
-
-class DocTags(Enum):
-    TEXT = 1
-    BOLD = 2
-    ITALIC = 3
-    CODE = 4
-    LINK = 5
-    IMAGE = 6
+from markdown_types import DocTags
 
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
@@ -25,21 +17,6 @@ class HTMLNode:
         for key in self.props:
             attrs.append(f"{key}=\"{self.props[key]}\"")
         return " ".join(attrs)
-
-    def text_node_to_html_node(self, text_node):
-        if text_node.text_type == DocTags.TEXT:
-            return LeafNode(text_node.text, None, None)
-        if text_node.text_type == DocTags.BOLD:
-            return LeafNode(text_node.text, "b", None)
-        if text_node.text_type == DocTags.ITALIC:
-            return LeafNode(text_node.text, "i", None)
-        if text_node.text_type == DocTags.CODE:
-            return LeafNode(text_node.text, "code", None)
-        if text_node.text_type == DocTags.LINK:
-            return LeafNode(text_node.text, "a", text_node.url)
-        if text_node.text_type == DocTags.IMAGE:
-            return LeafNode("", "img", text_node.url)
-        raise Exception("Invalid text type.")
 
     def __repr__(self):
         htmlElement = None
@@ -79,7 +56,7 @@ class LeafNode(HTMLNode):
             properties = self.props_to_html()
             if not properties == None:
                 openTag = f"{openTag[:-1]} {properties}>"
-            htmlElement = f"{openTag}{innerText}{closingTag}"
+            htmlElement = f"{openTag}{innerText.strip()}{closingTag}"
         if htmlElement == None:
             htmlElement = innerText
 
@@ -106,5 +83,4 @@ class ParentNode(HTMLNode):
             childElements.append(child.to_html())
 
         htmlElement = f"""{openTag}{"".join(childElements)}{closingTag}"""
-
         return htmlElement
