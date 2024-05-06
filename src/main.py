@@ -1,7 +1,7 @@
 import sys
 import os
 import shutil
-from  textnode import TextNode
+from textnode import TextNode
 from markdown import markdown_to_html_node
 
 def main():
@@ -17,8 +17,6 @@ def main():
 
     generate_page_recursive(os.path.join(root, "content"), os.path.join(root,
         "template.html"), os.path.join(root, dst))
-    #generate_page(os.path.join(root, "content", "index.md"), os.path.join(root,
-    #    "template.html"), os.path.join(root, dst, "index.html"))
 
 def generate_page_recursive(srcPath, templatePath, dstPath):
     for entry in os.listdir(srcPath):
@@ -32,7 +30,6 @@ def generate_page_recursive(srcPath, templatePath, dstPath):
                 createDir(dstPath, entry)
             generate_page_recursive(tempPath, templatePath,
                     os.path.join(dstPath, entry))
-
     return
 
 def generate_page(srcPath, templatePath, dstPath):
