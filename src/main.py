@@ -15,8 +15,25 @@ def main():
     createDir(root, dst)
     copyFilesRecursive(os.path.join(root, src), os.path.join(root, dst), ignore)
 
-    generate_page(os.path.join(root, "content", "index.md"), os.path.join(root,
-        "template.html"), os.path.join(root, dst, "index.html"))
+    generate_page_recursive(os.path.join(root, "content"), os.path.join(root,
+        "template.html"), os.path.join(root, dst))
+    #generate_page(os.path.join(root, "content", "index.md"), os.path.join(root,
+    #    "template.html"), os.path.join(root, dst, "index.html"))
+
+def generate_page_recursive(srcPath, templatePath, dstPath):
+    for entry in os.listdir(srcPath):
+        tempPath = os.path.join(srcPath, entry)
+        if os.path.isfile(tempPath) and entry.split(".")[-1] == "md":
+            newFileName = f"{''.join(entry.split('.')[:-1])}.html"
+            generate_page(tempPath, templatePath, os.path.join(dstPath,
+                newFileName))
+        else:
+            if not os.path.exists(os.path.join(dstPath, entry)):
+                createDir(dstPath, entry)
+            generate_page_recursive(tempPath, templatePath,
+                    os.path.join(dstPath, entry))
+
+    return
 
 def generate_page(srcPath, templatePath, dstPath):
     print(f"Generating page from {srcPath} to {dstPath} using {templatePath}.") 
